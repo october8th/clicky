@@ -1,21 +1,108 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import FriendCard from "./components/FriendCard";
+import Wrapper from "./components/Wrapper";
+import MyNavBar from "./components/MyNavBar";
+import friends from "./friends.json";
+import "./App.css";
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+class App extends React.Component {
+  state = {
+    friends:friends,
+    currentScore:0,
+    highScore:0,
+    gameMessage:'Click an image to begin!',
+    status:0
+  };
+
+  shuffle = (a) => {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  handleTouchFriend = (id) => {
+    let newFriends = this.state.friends;
+    const checkFriend = newFriends.indexOf(newFriends.find(friend => friend.id === id));
+    if((newFriends[checkFriend].touched === 0) && (this.state.status === 0))
+    {
+      newFriends[checkFriend].touched = 1;
+      this.shuffle(newFriends);
+      this.setState({friends:newFriends});
+      this.handleCurrentScore();
+    }
+    else if (this.state.status === 0)
+    {
+      this.setState({status:1});
+      this.youLose();
+    }
+    
+  }
+
+  handleHighScore = (score) => {
+    const newHighScore = score;
+    if(score > this.state.highScore)
+    this.setState({highScore:newHighScore});
+    if(score === 12){
+      this.setState({status:1});
+      this.youWin()
+    }
+  }
+
+  handleCurrentScore = () => {
+    const newScore = this.state.currentScore + 1;
+    this.setState({currentScore:newScore});
+    this.handleHighScore(newScore);
+  }
+
+resetFriends = () => {
+  let newFriends = this.state.friends;
+  newFriends.forEach(function(item,index){item.touched = 0});
+  this.setState({friends:newFriends});
+}
+
+  resetGame = () => {
+    this.setState({currentScore:0});
+    this.setState({status:0})
+    this.setState({gameMessage:"Click an image to begin!"})
+    this.resetFriends();
+  }
+
+  youLose = () => {
+    this.setState({gameMessage:"You Lose! (click me to reset)"});
+  }
+
+  youWin = () => {
+    this.setState({gameMessage:"You Win! (click me to reset)"});
+  }
+
+render() {
+  return (
+    <div>
+    <MyNavBar 
+        highScore = {this.state.highScore} 
+        currentScore = {this.state.currentScore}
+        resetGame = {this.resetGame}
+        gameMessage = {this.state.gameMessage}
+        />
+        <h2 className="title">Clicky Game!</h2>
+      <h4 className="title">Click on an image to earn points, but don't click on any more than once!</h4>
+    <Wrapper>
+      {this.state.friends.map(friend =>(
+        <FriendCard
+          handleTouchFriend ={this.handleTouchFriend}
+          key={friend.id}
+          id={friend.id}
+          name={friend.name}
+          image={friend.image}
+          occupation={friend.occupation}
+          location={friend.location}
+        />
+        ))}
+    </Wrapper>
+    </div>
     );
   }
 }
-
 export default App;
