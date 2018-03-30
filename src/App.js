@@ -27,13 +27,16 @@ class App extends React.Component {
     const checkFriend = newFriends.indexOf(newFriends.find(friend => friend.id === id));
     if((newFriends[checkFriend].touched === 0) && (this.state.status === 0))
     {
+      newFriends[checkFriend].goodBad = "cardGood";
       newFriends[checkFriend].touched = 1;
+      newFriends[checkFriend].goodBad = "";
       this.shuffle(newFriends);
       this.setState({friends:newFriends});
       this.handleCurrentScore();
     }
     else if (this.state.status === 0)
     {
+      newFriends[checkFriend].goodBad = "cardBad";
       this.setState({status:1});
       this.youLose();
     }
@@ -58,7 +61,10 @@ class App extends React.Component {
 
 resetFriends = () => {
   let newFriends = this.state.friends;
-  newFriends.forEach(function(item,index){item.touched = 0});
+  newFriends.forEach(function(item,index){
+    item.touched = 0;
+    item.goodBad = "";
+  });
   this.setState({friends:newFriends});
 }
 
@@ -98,6 +104,7 @@ render() {
           image={friend.image}
           occupation={friend.occupation}
           location={friend.location}
+          goodBad={friend.goodBad}
         />
         ))}
     </Wrapper>

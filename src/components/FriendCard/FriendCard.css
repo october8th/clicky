@@ -9,6 +9,14 @@
   text-align: left;
 }
 
+.cardGood {
+  border-color:green;
+}
+
+.cardBad {
+  border-color:red;
+}
+
 .card-img{
   height: 100%;
   overflow: hidden;
